@@ -1,22 +1,39 @@
-# 📚 Books Information API
+# 📚 Books Information API (FastAPI + SQLModel)
 
-A clean and beginner-friendly **REST API built with FastAPI** for retrieving book information.
+A clean and modern **REST API built with FastAPI and SQLModel** to manage and retrieve book information.  
+This project uses the **FastAPI lifespan event manager** (recommended approach) for database initialization.
 
 ---
 
 ## ✨ Features
 
-- 📖 List all available books  
+- 📖 List all books  
 - 🔍 Filter books by author  
-- 🆔 Retrieve book details using ID  
+- 🆔 Retrieve book details by ID  
+- 🗄️ SQLite database using SQLModel  
+- ⚡ Lifespan event manager (no deprecated startup events)
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Python**
+- **Python 3.9+**
 - **FastAPI**
+- **SQLModel**
+- **SQLite**
 - **Uvicorn**
+
+---
+
+## 📁 Project Structure
+
+```
+.
+├── main.py
+├── models.py
+├── database.db
+└── README.md
+```
 
 ---
 
@@ -25,7 +42,7 @@ A clean and beginner-friendly **REST API built with FastAPI** for retrieving boo
 ### 1. Install dependencies
 
 ```bash
-pip install fastapi uvicorn
+pip install fastapi uvicorn sqlmodel
 ```
 
 ### 2. Start the server
@@ -45,7 +62,7 @@ http://127.0.0.1:8000
 ## 📌 API Endpoints
 
 | Method | Endpoint | Description |
-|------|---------|------------|
+|------|--------|------------|
 | GET | / | API status |
 | GET | /books | Get all books |
 | GET | /books?author=Author%20C | Filter books by author |
@@ -55,7 +72,7 @@ http://127.0.0.1:8000
 
 ## 📘 API Documentation
 
-FastAPI provides automatic interactive documentation:
+FastAPI automatically generates interactive API docs:
 
 - **Swagger UI:** http://127.0.0.1:8000/docs  
 - **ReDoc:** http://127.0.0.1:8000/redoc  
@@ -64,9 +81,19 @@ FastAPI provides automatic interactive documentation:
 
 ## 🧠 Notes
 
-- Author filtering is case-sensitive  
-- Data is stored in-memory  
-- Restarting the server resets the data  
+- Tables are created automatically using the **lifespan event manager**
+- Data is stored in an SQLite database
+- Restarting the server does NOT delete data
+- Database starts empty (use POST endpoints or DB tools to insert data)
+
+---
+
+## 🚀 Future Improvements
+
+- Add POST / PUT / DELETE endpoints
+- Pagination & sorting
+- Database migrations (Alembic)
+- Authentication & authorization
 
 ---
 
@@ -77,4 +104,4 @@ _B.Tech Student | Backend & API Enthusiast_
 
 ---
 
-⭐ If you like this project, consider giving it a star!
+⭐ If you find this project useful, consider giving it a star!

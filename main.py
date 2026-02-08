@@ -1,42 +1,48 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlmodel import Session, select
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+from models import Book, engine, create_db_and_tables
 
-books = [
-    {
-        "id": 1,
-        "title": "The Lord of the Rings",
-        "author": "Author A",
-        "year": 1954
-    },
-    {    
-        "id": 2,
-        "title": "The Hobbit",
-        "author": "Author B",
-        "year": 1937
-    },
-    {    
-        "id": 3,
-        "title": "The Silmarillion",
-        "author": "Author C",
-        "year": 1977
-    }
-]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
 
 @app.get("/")
-async def root():
+def root():
     return {"message": "Books Information API"}
 
+
 @app.get("/books")
-async def get_books(author: str = None):
+def get_books(
+    author: str | None = None,
+    session: Session = Depends(get_session)
+):
+    statement = select(Book)
     if author:
-        filtered_books = [book for book in books if book["author"] == author]
-        return {"books details": filtered_books}
+        statement = statement.where(Book.author == author)
+
+    books = session.exec(statement).all()
     return {"books details": books}
 
+
 @app.get("/books/{id}")
-async def get_book_by_id(id: int):
-    for book in books:
-        if book["id"] == id:
-            return {"book details": book}
-    return {"message": "Book not found"}
+def get_book_by_id(
+    id: int,
+    session: Session = Depends(get_session)
+):
+    book = session.get(Book, id)
+    if not book:
+        return {"message": "Book not found"}
+    return {"book details": book}
