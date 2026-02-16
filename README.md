@@ -1,27 +1,31 @@
-# 📚 Books Information API (FastAPI + SQLModel)
+# 🔐 Assignment 4 – Authentication & Authorization (JWT) with FastAPI
 
-A clean and modern **REST API built with FastAPI and SQLModel** to manage and retrieve book information.  
-This project uses the **FastAPI lifespan event manager** (recommended approach) for database initialization.
+This assignment is part of **Session 4** of the FastAPI training program.  
+It focuses on implementing **JWT-based authentication**, **role-based authorization**, and securing CRUD operations using FastAPI dependencies.
 
 ---
 
-## ✨ Features
+## 🎯 Objectives Covered
 
-- 📖 List all books  
-- 🔍 Filter books by author  
-- 🆔 Retrieve book details by ID  
-- 🗄️ SQLite database using SQLModel  
-- ⚡ Lifespan event manager (no deprecated startup events)
+- JWT authentication concepts
+- OAuth2 Password flow with Bearer tokens
+- Password hashing using Passlib
+- Access token generation and validation
+- Securing routes using `Depends`
+- Role-based access control (Admin vs User)
+- Protecting CRUD operations
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Python 3.9+**
-- **FastAPI**
-- **SQLModel**
-- **SQLite**
-- **Uvicorn**
+- Python 3.9+
+- FastAPI
+- SQLModel
+- SQLite
+- Passlib (bcrypt)
+- Python-JOSE (JWT)
+- Uvicorn
 
 ---
 
@@ -31,27 +35,62 @@ This project uses the **FastAPI lifespan event manager** (recommended approach) 
 .
 ├── main.py
 ├── models.py
+├── auth.py
 ├── database.db
 └── README.md
 ```
 
 ---
 
-## ▶️ Run Locally
+## 👤 Authentication Features
 
-### 1. Install dependencies
+### User Registration
+- Allows new users to register
+- Passwords are securely hashed using Passlib
+- Default role assigned: `user`
+
+### User Login
+- Authenticates users using OAuth2 Password flow
+- Returns a JWT access token
+- Token type: Bearer
+
+---
+
+## 🔑 Authorization & Security
+
+- JWT Bearer token authentication
+- Protected routes using FastAPI dependencies
+- Role-based access:
+  - **User** → Can create books
+  - **Admin** → Can update and delete books
+
+---
+
+## 🔒 Protected Routes
+
+| Method | Endpoint | Access Level |
+|------|--------|--------------|
+| POST | /books | Authenticated user |
+| PUT | /books/{id} | Admin only |
+| DELETE | /books/{id} | Admin only |
+
+---
+
+## ▶️ Run the Application
+
+### Install dependencies
 
 ```bash
-pip install fastapi uvicorn sqlmodel
+pip install fastapi uvicorn sqlmodel passlib[bcrypt] python-jose
 ```
 
-### 2. Start the server
+### Start the server
 
 ```bash
 uvicorn main:app --reload
 ```
 
-### 3. Open in browser
+Open in browser:
 
 ```
 http://127.0.0.1:8000
@@ -59,49 +98,37 @@ http://127.0.0.1:8000
 
 ---
 
-## 📌 API Endpoints
+## 🧪 How to Test Authentication
 
-| Method | Endpoint | Description |
-|------|--------|------------|
-| GET | / | API status |
-| GET | /books | Get all books |
-| GET | /books?author=Author%20C | Filter books by author |
-| GET | /books/{id} | Get book by ID |
+1. Open Swagger UI: `/docs`
+2. Register a user using `/register`
+3. Login using `/login` to get JWT token
+4. Click **Authorize** and paste the token
+5. Access protected endpoints
 
 ---
 
 ## 📘 API Documentation
 
-FastAPI automatically generates interactive API docs:
-
-- **Swagger UI:** http://127.0.0.1:8000/docs  
-- **ReDoc:** http://127.0.0.1:8000/redoc  
+- Swagger UI: http://127.0.0.1:8000/docs  
+- ReDoc: http://127.0.0.1:8000/redoc  
 
 ---
 
 ## 🧠 Notes
 
-- Tables are created automatically using the **lifespan event manager**
-- Data is stored in an SQLite database
-- Restarting the server does NOT delete data
-- Database starts empty (use POST endpoints or DB tools to insert data)
-
----
-
-## 🚀 Future Improvements
-
-- Add POST / PUT / DELETE endpoints
-- Pagination & sorting
-- Database migrations (Alembic)
-- Authentication & authorization
+- JWT tokens expire after a configured time
+- Database persists data across restarts
+- Admin role can be assigned manually in the database if needed
+- Passwords are never stored in plain text
 
 ---
 
 ## 👤 Author
 
 **Abhinav Ajay**  
-_B.Tech Student | Backend & API Enthusiast_
+B.Tech Student | FastAPI Learner
 
 ---
 
-⭐ If you find this project useful, consider giving it a star!
+⭐ This README documents the completion of **Session 4 – Assignment (Authentication & Authorization using JWT)**.
