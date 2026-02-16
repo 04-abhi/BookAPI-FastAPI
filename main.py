@@ -52,19 +52,14 @@ def get_session():
 
 # ROUTES
 @app.get("/")
-def root():
+async def root():
     return {"message": "Books Information API"}
 
 @app.get("/books")
-def get_books(
-    author: str | None = None,
-    session: Session = Depends(get_session)
-):
-    statement = select(Book)
+async def get_books(author: str = None):
     if author:
-        statement = statement.where(Book.author == author)
-
-    books = session.exec(statement).all()
+        filtered_books = [book for book in books if book["author"] == author]
+        return {"books details": filtered_books}
     return {"books details": books}
 
 @app.get("/books/{id}")

@@ -1,39 +1,22 @@
-# 📚 Books Information API (FastAPI + SQLModel)
+# 📚 Books Information API
 
-A clean and modern **REST API built with FastAPI and SQLModel** to manage and retrieve book information.  
-This project uses the **FastAPI lifespan event manager** (recommended approach) for database initialization.
+A clean and beginner-friendly **REST API built with FastAPI** for retrieving book information.
 
 ---
 
 ## ✨ Features
 
-- 📖 List all books  
+- 📖 List all available books  
 - 🔍 Filter books by author  
-- 🆔 Retrieve book details by ID  
-- 🗄️ SQLite database using SQLModel  
-- ⚡ Lifespan event manager (no deprecated startup events)
+- 🆔 Retrieve book details using ID  
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Python 3.9+**
+- **Python**
 - **FastAPI**
-- **SQLModel**
-- **SQLite**
 - **Uvicorn**
-
----
-
-## 📁 Project Structure
-
-```
-.
-├── main.py
-├── models.py
-├── database.db
-└── README.md
-```
 
 ---
 
@@ -42,7 +25,7 @@ This project uses the **FastAPI lifespan event manager** (recommended approach) 
 ### 1. Install dependencies
 
 ```bash
-pip install fastapi uvicorn sqlmodel
+pip install fastapi uvicorn
 ```
 
 ### 2. Start the server
@@ -62,7 +45,7 @@ http://127.0.0.1:8000
 ## 📌 API Endpoints
 
 | Method | Endpoint | Description |
-|------|--------|------------|
+|------|---------|------------|
 | GET | / | API status |
 | GET | /books | Get all books |
 | GET | /books?author=Author%20C | Filter books by author |
@@ -72,7 +55,7 @@ http://127.0.0.1:8000
 
 ## 📘 API Documentation
 
-FastAPI automatically generates interactive API docs:
+FastAPI provides automatic interactive documentation:
 
 - **Swagger UI:** http://127.0.0.1:8000/docs  
 - **ReDoc:** http://127.0.0.1:8000/redoc  
@@ -81,19 +64,9 @@ FastAPI automatically generates interactive API docs:
 
 ## 🧠 Notes
 
-- Tables are created automatically using the **lifespan event manager**
-- Data is stored in an SQLite database
-- Restarting the server does NOT delete data
-- Database starts empty (use POST endpoints or DB tools to insert data)
-
----
-
-## 🚀 Future Improvements
-
-- Add POST / PUT / DELETE endpoints
-- Pagination & sorting
-- Database migrations (Alembic)
-- Authentication & authorization
+- Author filtering is case-sensitive  
+- Data is stored in-memory  
+- Restarting the server resets the data  
 
 ---
 
@@ -104,4 +77,4 @@ _B.Tech Student | Backend & API Enthusiast_
 
 ---
 
-⭐ If you find this project useful, consider giving it a star!
+⭐ If you like this project, consider giving it a star!
