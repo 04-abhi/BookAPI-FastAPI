@@ -1,78 +1,113 @@
-from fastapi import FastAPI, Depends, Request
+from fastapi import FastAPI, Depends, HTTPException
 from sqlmodel import Session, select
 from contextlib import asynccontextmanager
-import time
-import logging
+from fastapi.security import OAuth2PasswordRequestForm
 
-from models import Book, engine, create_db_and_tables
-
-# LOGGING CONFIGURATION
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s"
+from models import Book, User, engine, create_db_and_tables
+from auth import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    get_current_user,
+    admin_required
 )
 
-logger = logging.getLogger(__name__)
-
-
-# APPLICATION LIFECYCLE (LIFESPAN)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Application startup: creating database tables")
     create_db_and_tables()
     yield
-    logger.info("Application shutdown")
 
 app = FastAPI(lifespan=lifespan)
 
-# MIDDLEWARE: LOGGING + REQUEST TIMING
-@app.middleware("http")
-async def logging_middleware(request: Request, call_next):
-    start_time = time.perf_counter()
 
-    response = await call_next(request)
-
-    execution_time = (time.perf_counter() - start_time) * 1000
-
-    logger.info(
-        f"Method={request.method} | "
-        f"Path={request.url.path} | "
-        f"Status={response.status_code} | "
-        f"Time={execution_time:.2f}ms"
-    )
-
-    return response
-
-
-# DEPENDENCY: DATABASE SESSION
 def get_session():
     with Session(engine) as session:
         yield session
 
 
-# ROUTES
-@app.get("/")
-def root():
-    return {"message": "Books Information API"}
+# ---------------- AUTH ROUTES ----------------
 
-@app.get("/books")
-def get_books(
-    author: str | None = None,
+@app.post("/register")
+def register(username: str, password: str, session: Session = Depends(get_session)):
+    user_exists = session.exec(
+        select(User).where(User.username == username)
+    ).first()
+
+    if user_exists:
+        raise HTTPException(status_code=400, detail="Username already exists")
+
+    user = User(
+        username=username,
+        hashed_password=hash_password(password),
+        role="user"
+    )
+    session.add(user)
+    session.commit()
+    return {"message": "User registered successfully"}
+
+
+@app.post("/login")
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
     session: Session = Depends(get_session)
 ):
-    statement = select(Book)
-    if author:
-        statement = statement.where(Book.author == author)
+    user = session.exec(
+        select(User).where(User.username == form_data.username)
+    ).first()
 
-    books = session.exec(statement).all()
-    return {"books details": books}
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
-@app.get("/books/{id}")
-def get_book_by_id(
+    token = create_access_token({"sub": user.username})
+    return {"access_token": token, "token_type": "bearer"}
+
+
+# ---------------- BOOK ROUTES ----------------
+
+@app.get("/books")
+def get_books(session: Session = Depends(get_session)):
+    return session.exec(select(Book)).all()
+
+
+@app.post("/books")
+def create_book(
+    book: Book,
+    _: User = Depends(get_current_user),
+    session: Session = Depends(get_session)
+):
+    session.add(book)
+    session.commit()
+    return book
+
+
+@app.put("/books/{id}")
+def update_book(
     id: int,
+    book: Book,
+    _: User = Depends(admin_required),
+    session: Session = Depends(get_session)
+):
+    db_book = session.get(Book, id)
+    if not db_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    db_book.title = book.title
+    db_book.author = book.author
+    db_book.year = book.year
+    session.commit()
+    return db_book
+
+
+@app.delete("/books/{id}")
+def delete_book(
+    id: int,
+    _: User = Depends(admin_required),
     session: Session = Depends(get_session)
 ):
     book = session.get(Book, id)
     if not book:
-        return {"message": "Book not found"}
-    return {"book details": book}
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    session.delete(book)
+    session.commit()
+    return {"message": "Book deleted"}
