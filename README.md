@@ -1,19 +1,21 @@
-# 🔐 Assignment 4 – Authentication & Authorization (JWT) with FastAPI
+# 🧪 Session 5 – Testing & Documentation (FastAPI)
 
-This assignment is part of **Session 4** of the FastAPI training program.  
-It focuses on implementing **JWT-based authentication**, **role-based authorization**, and securing CRUD operations using FastAPI dependencies.
+This assignment covers **industry-standard testing and API documentation practices** using FastAPI.
+
+The focus of this session is writing complete test coverage for the Book API, including JWT-protected routes and negative testing scenarios.
 
 ---
 
 ## 🎯 Objectives Covered
 
-- JWT authentication concepts
-- OAuth2 Password flow with Bearer tokens
-- Password hashing using Passlib
-- Access token generation and validation
-- Securing routes using `Depends`
-- Role-based access control (Admin vs User)
-- Protecting CRUD operations
+- Swagger UI & ReDoc documentation
+- Response models validation
+- PyTest integration with FastAPI
+- TestClient usage
+- Dependency overrides for test database
+- Validating response schema & status codes
+- Testing JWT-protected routes
+- Negative testing patterns
 
 ---
 
@@ -21,11 +23,10 @@ It focuses on implementing **JWT-based authentication**, **role-based authorizat
 
 - Python 3.9+
 - FastAPI
+- PyTest
+- HTTPX (TestClient dependency)
 - SQLModel
 - SQLite
-- Passlib (bcrypt)
-- Python-JOSE (JWT)
-- Uvicorn
 
 ---
 
@@ -36,91 +37,82 @@ It focuses on implementing **JWT-based authentication**, **role-based authorizat
 ├── main.py
 ├── models.py
 ├── auth.py
-├── database.db
+├── tests/
+│   ├── conftest.py
+│   └── test_books.py
 └── README.md
 ```
 
 ---
 
-## 👤 Authentication Features
+## 🧪 Testing Implementation
 
-### User Registration
-- Allows new users to register
-- Passwords are securely hashed using Passlib
-- Default role assigned: `user`
+### ✅ TestClient
+FastAPI’s `TestClient` is used to simulate HTTP requests without running a live server.
 
-### User Login
-- Authenticates users using OAuth2 Password flow
-- Returns a JWT access token
-- Token type: Bearer
+### ✅ Dependency Override
+Database session dependency is overridden to use a **separate test database**, ensuring isolation from production data.
 
----
+### ✅ JWT Testing
+Tests include:
+- Login to retrieve access token
+- Passing Bearer token in headers
+- Verifying protected route access
+- Testing unauthorized access scenarios
 
-## 🔑 Authorization & Security
-
-- JWT Bearer token authentication
-- Protected routes using FastAPI dependencies
-- Role-based access:
-  - **User** → Can create books
-  - **Admin** → Can update and delete books
-
----
-
-## 🔒 Protected Routes
-
-| Method | Endpoint | Access Level |
-|------|--------|--------------|
-| POST | /books | Authenticated user |
-| PUT | /books/{id} | Admin only |
-| DELETE | /books/{id} | Admin only |
+### ✅ Negative Testing
+- Invalid credentials
+- Access without token
+- Access with wrong role
+- Resource not found (404)
 
 ---
 
-## ▶️ Run the Application
+## ▶️ Running Tests
 
 ### Install dependencies
 
 ```bash
-pip install fastapi uvicorn sqlmodel passlib[bcrypt] python-jose
+pip install pytest httpx
 ```
 
-### Start the server
+### Run test suite
 
 ```bash
-uvicorn main:app --reload
-```
-
-Open in browser:
-
-```
-http://127.0.0.1:8000
+pytest -v
 ```
 
 ---
 
-## 🧪 How to Test Authentication
+## 📊 What is Covered
 
-1. Open Swagger UI: `/docs`
-2. Register a user using `/register`
-3. Login using `/login` to get JWT token
-4. Click **Authorize** and paste the token
-5. Access protected endpoints
+| Test Area | Status |
+|-----------|--------|
+| Root endpoint | ✅ |
+| CRUD operations | ✅ |
+| JWT authentication | ✅ |
+| Role-based authorization | ✅ |
+| Status code validation | ✅ |
+| Error handling | ✅ |
 
 ---
 
 ## 📘 API Documentation
 
-- Swagger UI: http://127.0.0.1:8000/docs  
-- ReDoc: http://127.0.0.1:8000/redoc  
+FastAPI automatically generates interactive documentation:
+
+- Swagger UI: http://127.0.0.1:8000/docs
+- ReDoc: http://127.0.0.1:8000/redoc
 
 ---
 
-## 🧠 Notes
+## 🧠 Key Learning Outcomes
 
-- JWT tokens expire after a configured time
-- Database persists data across restarts
-- Admin role can be assigned manually in the database if needed
-- Passwords are never stored in plain text
+- Writing isolated and repeatable tests
+- Securing APIs and testing authentication
+- Validating responses and status codes
+- Applying dependency injection in testing
+- Implementing negative testing strategies
 
 ---
 
@@ -131,4 +123,4 @@ B.Tech Student | FastAPI Learner
 
 ---
 
-⭐ This README documents the completion of **Session 4 – Assignment (Authentication & Authorization using JWT)**.
+⭐ This README documents the completion of **Session 5 – Testing & Documentation Assignment**.

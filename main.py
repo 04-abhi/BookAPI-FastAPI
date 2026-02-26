@@ -27,6 +27,10 @@ def get_session():
 
 # ---------------- AUTH ROUTES ----------------
 
+@app.get("/")
+def read_root():
+    return {"message": "Books Information API"}
+
 @app.post("/register")
 def register(username: str, password: str, session: Session = Depends(get_session)):
     user_exists = session.exec(
